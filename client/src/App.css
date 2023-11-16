@@ -1,0 +1,15 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+.color-blue {
+  color: rgb(58, 88, 177);
+}
+.nav-item.is-active .nav-link {
+  color: #fff;
+  background-color: rgb(105, 135, 235);
+}
+.btn.xs {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.5rem;
+}
