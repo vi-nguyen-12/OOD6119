@@ -11,10 +11,16 @@
     />
 
     <title>React</title>
+    <script>
+      window.addEventListener("beforeunload", function () {
+        socket.close();
+      });
+    </script>
   </head>
 
   <body>
     <div id="root"></div>
+
     <script src="/main.js"></script>
   </body>
 </html>

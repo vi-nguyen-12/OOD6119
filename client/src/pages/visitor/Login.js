@@ -4,8 +4,14 @@ import Button from "react-bootstrap/esm/Button";
 
 const Login = () => {
   const [email, setEmail] = useState("");
-  const onSubmit = () => {
-    console.log("submit email");
+  const onSubmit = async () => {
+    try {
+      const result = await fetch(`http://localhost:5000/api/visitors/${email}`);
+      const data = await result.json();
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
   };
   return (
     <Container className="d-flex flex-column align-items-center justify-content-center">

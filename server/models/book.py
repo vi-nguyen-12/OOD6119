@@ -1,65 +1,52 @@
 from abc import ABC, abstractmethod
-from calendar import c
 
-# Abstract Product
+# Interface Product
 class Book (ABC):
+    def __init__(self, name, title, author, category,is_bestseller):
+        self.name = name
+        self.title = title
+        self.author = author
+        self.category = category
+        self.is_bestseller = is_bestseller
     @abstractmethod
     def __str__ (self):
         pass
 
 # Concrete Products
 class KidsBook (Book):
-    def __init__(self, name, title, author, category,age_range):
-        self.name=name
-        self.title=title
-        self.author=author
-        self.category=category
+    def __init__(self,name, title, author, category, is_bestseller, age_range):
+        super().__init__(name, title, author, category,is_bestseller)
         self.age_range=age_range
     def __str__ (self):
         return  f"KidsBook(name={self.name}, title={self.title}, author={self.author}, age_range={self.age_range}"
 
 class ScienceFictionBook (Book):
-    def __init__(self, name, title, author, category,technology):
-        self.name=name
-        self.title=title
-        self.author=author
-        self.category=category
+    def __init__(self, name, title, author, category,is_bestseller,technology):
+        super().__init__(name, title, author, category,is_bestseller)
         self.technology=technology
     def __str__ (self):
         return  f"ScienceFictionBook(name={self.name}, title={self.title}, author={self.author}, technology={self.technology}"
 class LiteraryBook (Book):
-    def __init__(self, name, title, author, category,awards):
-        self.name=name
-        self.title=title
-        self.author=author
-        self.category=category
+    def __init__(self, name, title, author, category,is_bestseller,awards):
+        super().__init__(name, title, author, category,is_bestseller)
         self.awards=awards
     def __str__ (self):
         return  f"LiteraryBook(name={self.name}, title={self.title}, author={self.author},awards={self.awards}"
 class AdventureBook (Book):
-    def __init__(self, name, title, author, category,challenges):
-        self.name=name
-        self.title=title
-        self.author=author
-        self.category=category
+    def __init__(self, name, title, author, category,is_bestseller,challenges):
+        super().__init__(name, title, author, category,is_bestseller)
         self.challenges=challenges
     def __str__ (self):
         return  f"KidsBook(name={self.name}, title={self.title}, author={self.author}, challenges={self.challenges}"
 class BiographyBook (Book):
-    def __init__(self, name, title, author, category,subject):
-        self.name=name
-        self.title=title
-        self.author=author
-        self.category=category
+    def __init__(self, name, title, author, category,is_bestseller,subject):
+        super().__init__(name, title, author, category, is_bestseller)
         self.subject=subject
     def __str__ (self):
         return  f"KidsBook(name={self.name}, title={self.title}, author={self.author}, subject={self.subject}"
 class ComicsBook (Book):
-    def __init__(self, name, title, author, category,artist):
-        self.name=name
-        self.title=title
-        self.author=author
-        self.category=category
+    def __init__(self, name, title, author, category,is_bestseller,artist):
+        super().__init__(name, title, author, category,is_bestseller)
         self.artist=artist
     def __str__ (self):
         return  f"ArtistBook(name={self.name}, title={self.title}, author={self.author}, artist ={self.artist}"

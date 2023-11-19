@@ -17,6 +17,10 @@ module.exports = {
     hot: true,
     liveReload: true,
     historyApiFallback: true,
+    headers: { "Access-Control-Allow-Origin": "*" },
+    https: false,
+    allowedHosts: "all",
+    // host: ["localhost", "127.0.0.1"],
   },
   resolve: {
     extensions: [".js", ".jsx", ".json", ".ts"],
