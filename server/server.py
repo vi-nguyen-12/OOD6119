@@ -3,7 +3,6 @@
 # then run "python3 server.py"
 from flask import Flask
 from flask_cors import CORS
-from flask_cors import cross_origin
 from api.bookApi import book_api
 from api.visitorApi import visitor_api
 
