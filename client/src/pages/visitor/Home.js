@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
@@ -8,15 +8,21 @@ const Home = () => {
   const location = useLocation();
   const { pathname } = location;
   const isActive = pathname.split("/")[2];
+  const email = localStorage.getItem("email");
 
   const handleClick = (page) => () => {
-    navigate(`/visitor/${page}`);
+    navigate(`/visitor/home/${page}`);
   };
+  useEffect(() => {
+    if (!email) {
+      navigate("/visitor/login");
+    }
+  }, []);
 
   return (
     <Container className="text-center mt-5">
       <h5 className="d-flex justify-content-end">Visitor Email</h5>
-      <h6 className="d-flex justify-content-end">user_test@gmail.com</h6>
+      <h6 className="d-flex justify-content-end">{email}</h6>
       <Nav
         fill
         variant="tabs"

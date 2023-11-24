@@ -1,16 +1,23 @@
 import React, { useState } from "react";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/esm/Button";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
+  const navigate = useNavigate();
+
   const onSubmit = async () => {
     try {
       const result = await fetch(`http://localhost:5000/api/visitors/${email}`);
       const data = await result.json();
-      console.log(data);
+      if (!result.ok) {
+        throw new Error(data.error);
+      }
+      localStorage.setItem("email", data.email);
+      navigate("/visitor/home");
     } catch (err) {
-      console.log(err);
+      alert(err);
     }
   };
   return (
