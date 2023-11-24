@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from ast import Str
-from datetime import datetime
-from user import Visitor
-from book import Book
+from datetime import datetime, timedelta
+# from visitor import Visitor
+# from book import Book
 
 
 # Decorator Pattern
@@ -38,13 +38,18 @@ class MembershipDecorator(LateFeeDecorator):
         fee= self.decorated.calculate_fee(due_date,return_date)
         return fee - 1 if fee > 1 else 0
 
-# This function applied decorator pattern to caluculate late fee
-def calculate_fee (book: Book, visitor: Visitor, due_date:Str, return_date:Str):
+# This function applied decorator pattern to caluculate late fee:
+# Decorate the LateFee class
+# if book is bestseller, apply BestSellerDecorator
+# if visitor is member, apply MembershipDecorator
+def calculate_fee (borrow_date:Str, return_date:Str, is_member:bool, is_bestseller:bool) -> int:
+    due_date =datetime.strptime(borrow_date,"%Y-%m-%d")+timedelta(days=15)
+    due_date_str=due_date.strftime("%Y-%m-%d")
     fee= FixedLateFee()
-    if book.is_bestseller:
+    if is_bestseller:
         fee=BestSellerDecorator(fee)
-    if visitor.is_member:
+    if is_member:
         fee=MembershipDecorator(fee)
-    return fee.calculate_fee(due_date,return_date)
+    return fee.calculate_fee(due_date_str,return_date)
 
 
