@@ -6,6 +6,7 @@ import sys
 sys.path.append('../')
 # from models import visitor
 from models.latefeecalculator import calculate_fee
+from database_handler import DatabaseAccessLayer
 
 app = Flask(__name__)
 db = DatabaseAccessLayer(config_file='config.ini')
