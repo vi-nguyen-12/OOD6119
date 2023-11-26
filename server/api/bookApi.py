@@ -43,7 +43,7 @@ except Exception as e:
 def get_book(book_id):
     try:
         # [N] should query from DB to get a book by its id
-        select_book_query = "SELECT * FROM Book WHERE _id =%s"
+        select_book_query = "SELECT * FROM Book WHERE book_id =%s"
         book_data = db.fetch_data(select_book_query, (book_id,))
 
         if not book_data:
@@ -83,8 +83,8 @@ def add_book():
         # table includes: _id, title, author, category, is_bestseller, is_available=True, age_range, technology,awards, challenges, subject, artist
         insert_book_query = """
         INSERT INTO Book (title, author, category, is_bestseller, is_available,
-                          age_range, technology, awards, challenges, subject, artist)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                          min_age, max_age, technology, awards, challenges, subject, artist)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         book_data = (
             title, author, category, is_bestseller, True,
@@ -107,7 +107,7 @@ def add_book():
 def remove_book(book_id):
      try:
         # [N] Delete a book from the database
-        delete_book_query = "DELETE FROM Book WHERE _id = %s"
+        delete_book_query = "DELETE FROM Book WHERE book_id = %s"
         db.execute_query(delete_book_query, (book_id,))
 
         return jsonify({"message": f"Book {book_id} deleted successfully"}), 200
