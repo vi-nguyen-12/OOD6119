@@ -127,6 +127,15 @@ def borrow_book():
     visitor_email=data.get("visitor_email")
     book_id=data.get("book_id")
 
+    # [N] update is_available to False in the Book table
+    update_query_book_availability = "UPDATE Book SET is_available = False WHERE book_id = %s"
+    db.execute_query(update_query_book_availability, (book_id,))
+
+    # [N] add visitor_email and book_id to BorrowBooks table
+    insert_query_borrow_books = "INSERT INTO BorrowBooks (visitor_email, book_id, borrow_date) VALUES (%s, %s, %s)"
+    db.execute_query(insert_query_borrow_books, (visitor_email, book_id, datetime.now().strftime("%Y-%m-%d")))
+
+
     # [N] get book with specific id from Book table, and update is_available to False
     # [from dummy]
     book=None

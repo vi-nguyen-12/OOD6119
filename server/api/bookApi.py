@@ -9,32 +9,52 @@ from models import book
 
 book_api =Blueprint("book_api", __name__)
 
+#Initialize the DatabaseAccessLayer
+db = DatabaseAccessLayer(config_file='config.ini')
+
 # Get all books
 @book_api.route("/", methods=["GET"])
 def get_books():
-    # [N] should query from DB to get all books
+    try:
+        # [N] should query from DB to get all books
+        # select_all_books_query = "SELECT * FROM Book"
+        # books_data = db.fetch_data(select_all_books_query)
+    
     # result =cursor.fetchall()
 
     #[from dummy]
 
-    books =[
-        {"_id":row[0], "title":row[1],"author":row[2],
-         "category":row[3], "is_bestseller":row[4],
-         "is_available":row[5], "age_range":row[6],
-         "technology":row[7], "awards":row[8],
-         "challenges":row[9], "subject":row[10],
-         "artists":row[11]
-         } for row in dummy.books
-    ]
- 
-    return jsonify( books)
+        books =[
+            {"_id":row[0], "title":row[1],"author":row[2],
+            "category":row[3], "is_bestseller":row[4],
+            "is_available":row[5], "age_range":row[6],
+            "technology":row[7], "awards":row[8],
+            "challenges":row[9], "subject":row[10],
+            "artists":row[11]
+            } for row in dummy.books
+        ]
+    
+        return jsonify( books)
+
+    except Exception as e:
+        print(f"Error retrieving books from the database: {e}")
+    return jsonify({"error": "Failed to retrieve books"}), 500
 
 # Get a specific book
 @book_api.route("/<int:book_id>", methods=["GET"])
 def get_book(book_id):
-    # [N] should query from DB to get a book by its id
-    return jsonify({"message": f"Get book {book_id}"})
+    try:
+        # [N] should query from DB to get a book by its id
+        select_book_query = "SELECT * FROM Book WHERE book_id =%s"
+        book_data = db.fetch_data(select_book_query, (book_id,))
 
+        if not book_data:
+            return jsonify({"error": "Book not found"}), 404
+        return jsonify({"message": f"Get book {book_id}"})
+    
+    except Exception as e:
+        print(f"Error retrieving book from the database: {e}")
+        return jsonify({"error": "Failed to retrieve book"}), 500
 # Create a new book
 @book_api.route("/", methods=["POST"])
 def add_book():
@@ -64,7 +84,23 @@ def add_book():
     try:
         new_book = book_creator.create_book(title,author,category,is_bestseller,additional_field.get(category))
         # [N] should add new_book to DB, 
-        # table includes: _id, title, author, category, is_bestseller, is_available=True, age_range, technology,awards, challenges, subject, artist 
+        # table includes: _id, title, author, category, is_bestseller, is_available=True, age_range, technology,awards, challenges, subject, artist
+        # insert_book_query = """
+        # INSERT INTO Book (title, author, category, is_bestseller, is_available,
+        #                   min_age, max_age, technology, awards, challenges, subject, artist)
+        # VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        # """
+        # book_data = (
+        #     title, author, category, is_bestseller, True,
+        #     additional_field.get("Kids"), additional_field.get("ScienceFiction"),
+        #     additional_field.get("Literary"), additional_field.get("Adventure"),
+        #     additional_field.get("Biography"), additional_field.get("Comics")
+        # )
+
+        # db.execute_query(insert_book_query, book_data)
+
+        return jsonify({"message": "Book added successfully"}), 201
+         
     except Exception as e:
         print(f"Error creating book: {e}")
         return jsonify({"error": f"Error creating book: {e}"}), 500
