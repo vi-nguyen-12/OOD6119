@@ -10,7 +10,7 @@ const Home = () => {
   const isActive = pathname.split("/")[2];
 
   const handleClick = (page) => () => {
-    navigate(`/admin/${page}`);
+    navigate(`/admin/home/${page}`);
   };
 
   return (
@@ -34,6 +34,12 @@ const Home = () => {
           onClick={handleClick("borrow")}
         >
           <Nav.Link>Borrow books</Nav.Link>
+        </Nav.Item>
+        <Nav.Item
+          className={isActive === "borrow" ? "is-active" : "not-active"}
+          onClick={handleClick("catalog")}
+        >
+          <Nav.Link>Admin catalog</Nav.Link>
         </Nav.Item>
       </Nav>
       <Outlet />
