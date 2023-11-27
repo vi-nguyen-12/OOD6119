@@ -1,9 +1,23 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
 import { AiOutlineCheck } from "react-icons/ai";
 
 const Book = () => {
+  const [books, setBooks] = useState([]);
+  useEffect(() => {
+    const get_books = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/books");
+        const data = await response.json();
+        console.log(data);
+        setBooks(data);
+      } catch {
+        (err) => alert(err.message);
+      }
+    };
+    get_books();
+  }, []);
   return (
     <Container>
       <h3 className="color-blue mt-5 ">List of books</h3>
@@ -15,38 +29,22 @@ const Book = () => {
             <th>Title</th>
             <th>Author</th>
             <th>Category</th>
+            <th>Best seller</th>
             <th>Available</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>7478</td>
-            <td>The Great Gasby</td>
-            <td>FScott Fitzgerald</td>
-            <td>Novel</td>
-            <td>
-              <AiOutlineCheck />
-            </td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>8782</td>
-            <td>Little Red Riding Hood</td>
-            <td>Charles Perrult</td>
-            <td>Kids</td>
-            <td>
-              <AiOutlineCheck />
-            </td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>4625</td>
-            <td>Elon Musk</td>
-            <td>Walter Isaacson</td>
-            <td>Biography</td>
-            <td></td>
-          </tr>
+          {books.map((book, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>{book._id}</td>
+              <td>{book.title}</td>
+              <td>{book.author}</td>
+              <td>{book.category}</td>
+              <td>{book.is_bestseller && <AiOutlineCheck />}</td>
+              <td>{book.is_available && <AiOutlineCheck />}</td>
+            </tr>
+          ))}
         </tbody>
       </Table>
     </Container>

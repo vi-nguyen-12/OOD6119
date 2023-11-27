@@ -1,17 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
+import { get_due_date } from "../../helper";
 
 const Borrow = () => {
   const [books, setBooks] = useState([]);
-  const get_due_date = (borrow_date_str) => {
-    const date = new Date(borrow_date_str);
-    date.setDate(date.getDate() + 15);
-    const year = date.getFullYear();
-    const month = ("0" + (date.getMonth() + 1)).slice(-2);
-    const day = ("0" + date.getDate()).slice(-2);
-    return `${year}-${month}-${day}`;
-  };
+
   useEffect(() => {
     const email = localStorage.getItem("email");
     const get_borrow_books = async () => {
