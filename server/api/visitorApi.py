@@ -9,7 +9,7 @@ from models.latefeecalculator import calculate_fee
 from database_handler import DatabaseAccessLayer
 
 app = Flask(__name__)
-db = DatabaseAccessLayer(config_file='config.ini')
+# db = DatabaseAccessLayer(config_file='config.ini')
 
 visitor_api =Blueprint("visitor_api", __name__)
 
@@ -142,3 +142,30 @@ def borrow_book():
     # [from dummy]
     dummy.borrow_books.append([visitor_email,book_id,datetime.now().strftime("%Y-%m-%d"),None,0])
     #[N]
+    return jsonify({"message":"Book borrowed successfully"}), 200
+
+# visitor return a book (and pay late fee in case)
+@visitor_api.route("/return", methods=["POST"])
+def return_book():
+    data=request.get_json()
+    visitor_email=data.get("visitor_email")
+    book_id=data.get("book_id")
+    # [N] get borrowed book in Borrowed book table with specific visitor_email and book_id and update payment = 0
+    # [from dummy]
+    borrowed_book=None
+    for b in dummy.borrow_books:
+        if b[0]==visitor_email and b[1]==book_id:
+            borrowed_book=b
+            break
+    if borrowed_book is None:
+        return jsonify({"error":"No borrowed book found"}), 400
+    print(datetime.now().strftime("%Y-%m-%d"))
+    borrowed_book[3]=datetime.now().strftime("%Y-%m-%d")
+     # [N] get book with specific id from Book table, and update is_available to True;
+     # [from dummy]
+    for b in dummy.books:
+        if b[0]==book_id:
+            b[5]=True
+            break
+    return jsonify({"message":"Return successfully"}), 200
+   
