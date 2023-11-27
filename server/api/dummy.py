@@ -13,10 +13,10 @@ books= [
     ["test_id_5","test title 5","test author 5","adventure",False,False, None,None,None,"challenges test",None, None],
     ["test_id_6","test title 6","test author 6","literary",False,False, None,None,"awards test 6",None,None, None],
 ]
-borrow_books_cols = ["visitor_email","book_id","borrow_date","return_date","late_fee","is_paid"],
+borrow_books_cols = ["visitor_email","book_id","borrow_date","return_date","late_fee"],
 
 borrow_books= [
-    ["test@gmail.com","test_id_4","2023-10-10","2023-10-18",0],
+    ["test1@gmail.com","test_id_4","2023-10-10","2023-10-18",0],
     ["test2@gmail.com","test_id_5","2023-10-09",None,0],
     ["test2@gmail.com","test_id_6","2023-11-18",None,0],
     ]
