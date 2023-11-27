@@ -10,6 +10,7 @@ import VisitorHome from "./pages/visitor/Home";
 import AdminHome from "./pages/admin/Home";
 import AdminBook from "./pages/admin/Book";
 import AdminBorrow from "./pages/admin/Borrow";
+import AdminCatalog from "./pages/admin/Catalog";
 import Home from "./pages/Home";
 
 const App = () => {
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="/admin/home" element={<AdminHome />}>
             <Route path="books" element={<AdminBook />} />
             <Route path="borrow" element={<AdminBorrow />} />
+            <Route path="catalog" element={<AdminCatalog />} />
           </Route>
 
           <Route path="/" element={<Home />} />
