@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+import sys
+sys.path.append('../')
 
 # Interface Product
 class Book (ABC):
@@ -10,6 +12,9 @@ class Book (ABC):
     @abstractmethod
     def __str__ (self):
         pass
+    @abstractmethod
+    def save_to_db(self):
+        pass
 
 # Concrete Products
 class KidsBook (Book):
@@ -18,6 +23,11 @@ class KidsBook (Book):
         self.age_range=age_range
     def __str__ (self):
         return  f"KidsBook( title={self.title}, author={self.author}, age_range={self.age_range}"
+    def save_to_db(self):
+        from main import db_connection
+        query="INSERT INTO books (title, author, category, is_bestseller, age_range) VALUES(%s, %s, %s, %s, %s)"
+        data=(self.title, self.author, self.category, self.is_bestseller, self.age_range)  
+        db_connection.execute_query(query, data)
 
 class ScienceFictionBook (Book):
     def __init__(self,  title, author, category,is_bestseller,technology):
@@ -25,56 +35,81 @@ class ScienceFictionBook (Book):
         self.technology=technology
     def __str__ (self):
         return  f"ScienceFictionBook(title={self.title}, author={self.author}, technology={self.technology}"
+    def save_to_db(self):
+        from main import db_connection
+        query="INSERT INTO books (title, author, category, is_bestseller, technology) VALUES(%s, %s, %s, %s, %s)"
+        data=(self.title, self.author, self.category, self.is_bestseller, self.technology)  
+        db_connection.execute_query(query, data)
 class LiteraryBook (Book):
     def __init__(self,  title, author, category,is_bestseller,awards):
         super().__init__( title, author, category,is_bestseller)
         self.awards=awards
     def __str__ (self):
         return  f"LiteraryBook( title={self.title}, author={self.author},awards={self.awards}"
+    def save_to_db(self):
+        from main import db_connection
+        query="INSERT INTO books (title, author, category, is_bestseller, awards) VALUES(%s, %s, %s, %s, %s)"
+        data=(self.title, self.author, self.category, self.is_bestseller, self.awards)  
+        db_connection.execute_query(query, data)
 class AdventureBook (Book):
     def __init__(self,  title, author, category,is_bestseller,challenges):
         super().__init__( title, author, category,is_bestseller)
         self.challenges=challenges
     def __str__ (self):
-        return  f"KidsBook( title={self.title}, author={self.author}, challenges={self.challenges}"
+        return  f"AdventureBook( title={self.title}, author={self.author}, challenges={self.challenges}"
+    def save_to_db(self):
+        from main import db_connection
+        query="INSERT INTO books (title, author, category, is_bestseller, challenges) VALUES(%s, %s, %s, %s, %s)"
+        data=(self.title, self.author, self.category, self.is_bestseller, self.challenges)  
+        db_connection.execute_query(query, data)
 class BiographyBook (Book):
     def __init__(self,  title, author, category,is_bestseller,subject):
         super().__init__(title, author, category, is_bestseller)
         self.subject=subject
     def __str__ (self):
-        return  f"KidsBook(title={self.title}, author={self.author}, subject={self.subject}"
+        return  f"BiographyBook(title={self.title}, author={self.author}, subject={self.subject}"
+    def save_to_db(self):
+        from main import db_connection
+        query="INSERT INTO books (title, author, category, is_bestseller, subject) VALUES(%s, %s, %s, %s, %s)"
+        data=(self.title, self.author, self.category, self.is_bestseller, self.subject)  
+        db_connection.execute_query(query, data)
 class ComicsBook (Book):
     def __init__(self, title, author, category,is_bestseller,artist):
         super().__init__( title, author, category,is_bestseller)
         self.artist=artist
     def __str__ (self):
-        return  f"ArtistBook(title={self.title}, author={self.author}, artist ={self.artist}"
+        return  f"ComicsBook(title={self.title}, author={self.author}, artist ={self.artist}"
+    def save_to_db(self):
+        from main import db_connection
+        query="INSERT INTO books (title, author, category, is_bestseller, artist) VALUES(%s, %s, %s, %s, %s)"
+        data=(self.title, self.author, self.category, self.is_bestseller, self.artist)  
+        db_connection.execute_query(query, data)
 
 # Abstract factory
 class BookCreator(ABC):
     @abstractmethod
-    def create_book (self, title, author, category, **kwargs):
+    def create_book (self, title, author, category, is_bestseller,**kwargs):
         pass
 
 # Concrete factory
 class KidsCreator(BookCreator):
-    def create_book(self, title, author, category,ageRange):
-        return KidsBook( title, author, category,ageRange)
+    def create_book(self, title, author, category,is_bestseller,ageRange):
+        return KidsBook( title, author, category,is_bestseller,ageRange)
 class ScienceFictionCreator(BookCreator):
-    def create_book(self,title, author, category,technology):
-        return ScienceFictionBook( title, author, category,technology)
+    def create_book(self,title, author, category,is_bestseller,technology):
+        return ScienceFictionBook( title, author, category,is_bestseller,technology)
 class LiteraryCreator(BookCreator):
-    def create_book(self,title, author, category,awards):
-        return LiteraryBook( title, author, category,awards)
+    def create_book(self,title, author, category,is_bestseller,awards):
+        return LiteraryBook( title, author, category,is_bestseller,awards)
 class AdventureCreator(BookCreator):
-    def create_book(self, title, author, category,challenges):
-        return AdventureBook( title, author, category,challenges)
+    def create_book(self, title, author, category,is_bestseller,challenges):
+        return AdventureBook( title, author, category,is_bestseller,challenges)
 class BiographyCreator(BookCreator):
-    def create_book(self, title, author, category,subject):
-        return BiographyBook(title, author, category,subject)
+    def create_book(self, title, author, category,is_bestseller,subject):
+        return BiographyBook(title, author, category,is_bestseller,subject)
 class ComicsCreator(BookCreator):
-    def create_book(self,title, author, category,artist):
-        return ComicsBook(title, author, category,artist)
+    def create_book(self,title, author, category,is_bestseller,artist):
+        return ComicsBook(title, author, category,is_bestseller,artist)
 
 # Create Concrete Factory based on category
 class BookCreatorFactory:
