@@ -2,8 +2,8 @@ import json
 from flask import Flask, request, Blueprint, jsonify
 from . import dummy
 from datetime import datetime
-import sys
-sys.path.append('../')
+# import sys
+# sys.path.append('../')
 # from models import visitor
 from models.latefeecalculator import calculate_fee
 from database_handler import DatabaseAccessLayer
@@ -35,89 +35,20 @@ def get_visitor(email):
 # get all borrowed books of a visitor
 @visitor_api.route("/<email>/books/borrowed", methods=["GET"])
 def get_borrowed_books(email):
-    # [N] get borrowed books of a visitor from DB
-    visitor=None
-    for v in dummy.visitors:
-        if v[1]==email:
-            visitor=v
-            break
-    if visitor is None:
-        return jsonify({"error":"No visitor found"}), 400
+
     # [N] get all borrowed books of a visitor from DB, along with details of each book, used "join"
-    # [from dummy]
-    borrow_books=list(dummy.borrow_books)
-    books=list(dummy.books)
-    borrow_books=[e for e in borrow_books if e[0]==email]
-    select_query_visitor = "SELECT * FROM Visitor WHERE email = %s"
-#     visitor_data = db.fetch_data(select_query_visitor, (email,))
+    try:
+        from main import db_connection
+        query_fetch_borrow_books = "SELECT borrow.transaction_id, borrow.book_id, borrow.borrow_date, borrow.return_date, borrow.late_fee, books.title, books.author, books.category, books.is_bestseller, books.is_available, books.age_range, books.technology, books.awards, books.challenges, books.subject, books.artist FROM borrow JOIN books ON borrow.book_id = books._id WHERE borrow.visitor_email = %s "
+        borrow_books = db_connection.fetch_data(query_fetch_borrow_books, (email,))
+    except (Exception) as e:
+        return jsonify({"error": "Failed to retrieve book"}), 500
+    cols =["transaction_id","_id","borrow_date", "return_date", "late_fee","title","author", "category", "is_bestseller","is-available","age_range","technology","awards","challenges","subject","artist"]
 
-#     if not visitor_data:
-#         return jsonify({"error": "No visitor found"}), 400
-
-#     visitor = visitor_data[0]
-
-#     result = {}
-#     name_cols =v["user_id", "username", "password", "email", "total_late_fees", "subscription"]
-#     for i in range(len(name_cols)):
-#         result[name_cols[i]] = visitors[i]
-
-#     return jsonify(result)
-
-# if __name__ == "__main__":
-#     app.register_blueprint(visitor_api)
-#     app.run(debug=True)
-
-    # [N] get visitor with specific email from DB
-    # [from dummy]
-    #visitor=None
-    #for v in dummy.visitors:
-    #    if v[1]==email:
-    #        visitor=v
-    #        break
-    #if visitor is None:
-    #    return jsonify({"error":"No visitor found"}), 400
-    #result={}
-    #name_cols=dummy.visitors[0]
-    #for i in range(len(name_cols)):
-    #    result[name_cols[i]]=visitor[i]
-    #print(result)
-    #return jsonify(result)
-
-
-    for e in borrow_books:
-        # find details of each book
-        b= next((x for x in books if e[1]==x[0]),None)
-   
-        if b is None:
-            return jsonify({"error":"No book found"}), 400
-        # calculate late fee of each book
-        return_date=e[3]
-        if return_date is None:
-            return_date = datetime.now().strftime("%Y-%m-%d")
-        late_fee=calculate_fee(e[2],return_date,visitor[2],b[4])
-        # [N] update late fee to 
-        # add details of each book
-        e.extend(b)
-        e.append(late_fee)
-
-    
-    borrow_books =[ {
-        "book_id":b[1],
-        "borrow_date":b[2],
-        "return_date":b[3],
-        "title":b[6],
-        "author":b[7],
-        "category":b[8],
-        "age_range":b[11],
-        "technology":b[12],
-        "awards":b[13],
-        "challenges":b[14],
-        "subject":b[15],
-        "artist":b[16],
-        "late_fee":b[17]
-    }for b in borrow_books]
-
-    return jsonify(borrow_books)
+    json_borrow_books = [dict(zip(cols, row)) for row in borrow_books]
+ 
+    print(json_borrow_books)
+    return jsonify(json_borrow_books), 200
 
 
 # borrow a book
@@ -126,31 +57,24 @@ def borrow_book():
     data=request.get_json()
     visitor_email=data.get("visitor_email")
     book_id=data.get("book_id")
+    print(type(book_id))
+    try:
+        from main import db_connection
+        # check if the book is available:
+        query_get_book_availability= "SELECT is_available FROM books WHERE _id = %s"
+        book_availability=db_connection.fetch_data(query_get_book_availability, (book_id,))
+     
+        if book_availability[0][0] ==0:
+            return jsonify({"error":"Book is not available to borrow"}), 500
+        # [N] update is_available to False in the Book table
+        query_update_book_availability= "UPDATE books SET is_available = False WHERE _id = %s"
+        db_connection.execute_query(query_update_book_availability, (book_id,))
 
-    # [N] update is_available to False in the Book table
-    update_query_book_availability = "UPDATE Book SET is_available = False WHERE book_id = %s"
-    db.execute_query(update_query_book_availability, (book_id,))
-
-    # [N] add visitor_email and book_id to BorrowBooks table
-    insert_query_borrow_books = "INSERT INTO BorrowBooks (visitor_email, book_id, borrow_date) VALUES (%s, %s, %s)"
-    db.execute_query(insert_query_borrow_books, (visitor_email, book_id, datetime.now().strftime("%Y-%m-%d")))
-
-
-    # [N] get book with specific id from Book table, and update is_available to False
-    # [from dummy]
-    book=None
-    for b in dummy.books:
-        if b[0]==book_id:
-            book=b
-            b[5]=False
-            break
-    if book is None:
-        return jsonify({"error":"No book found"}), 400
-    
-    # [N] add visitor_email and book_id to borrow_books, borrow_date table
-    # [from dummy]
-    dummy.borrow_books.append([visitor_email,book_id,datetime.now().strftime("%Y-%m-%d"),None,0])
-    #[N]
+        # [N] add visitor_email and book_id to borrow table
+        query_insert_borrow_books = "INSERT INTO borrow (visitor_email, book_id, borrow_date) VALUES (%s, %s, %s)"
+        db_connection.execute_query(query_insert_borrow_books, (visitor_email, book_id, datetime.now().strftime("%Y-%m-%d")))
+    except (Exception) as e:
+        return jsonify({"Error updating database":str(e)}), 500
     return jsonify({"message":"Book borrowed successfully"}), 200
 
 # visitor return a book (and pay late fee in case)
