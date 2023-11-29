@@ -16,7 +16,7 @@ const Home = () => {
   return (
     <Container className="text-center mt-5">
       <h5 className="d-flex justify-content-end">Admin Email</h5>
-      <h6 className="d-flex justify-content-end">admin_test@gmail.com</h6>
+      <h6 className="d-flex justify-content-end">admin@gmail.com</h6>
       <Nav
         fill
         variant="tabs"

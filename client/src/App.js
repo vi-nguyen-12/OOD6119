@@ -3,6 +3,7 @@ import Banner from "./components/Banner";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import VisitorLogin from "./pages/visitor/Login";
+import AdminLogin from "./pages/admin/Login";
 import VisitorBook from "./pages/visitor/Book";
 import VisitorBorrow from "./pages/visitor/Borrow";
 import VisitorSubscribe from "./pages/visitor/Subscribe";
@@ -20,6 +21,7 @@ const App = () => {
         <Banner />
         <Routes>
           <Route path="/visitor/login" element={<VisitorLogin />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/visitor/home" element={<VisitorHome />}>
             <Route path="books" element={<VisitorBook />} />
             <Route path="borrow" element={<VisitorBorrow />} />

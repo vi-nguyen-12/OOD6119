@@ -19,7 +19,11 @@ const Home = () => {
           {" "}
           Visitor
         </Button>
-        <Button variant="primary" className="ml-5 py-3 px-5">
+        <Button
+          variant="primary"
+          className="ml-5 py-3 px-5"
+          onClick={() => navigate("/admin/login")}
+        >
           Admin
         </Button>
       </Col>
