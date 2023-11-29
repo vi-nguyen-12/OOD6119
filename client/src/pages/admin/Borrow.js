@@ -9,28 +9,24 @@ import { AiOutlineCheck } from "react-icons/ai";
 const Borrow = () => {
   const [books, setBooks] = useState([]);
 
-  const return_book = (visitor_email, book_id) => async () => {
+  const return_book = (transaction_id) => async () => {
     try {
-      const response = await fetch(
+      const response = await axios.post(
         `http://localhost:5000/api/visitors/return`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ visitor_email, book_id }),
-        }
+        { transaction_id }
       );
       if (response.status !== 200) {
         throw new Error(response.error);
       }
-      const data = await response.json();
+
       setBooks((prev) => {
         return prev.map((b) =>
-          b.visitor_email === visitor_email && b.book_id === book_id
+          b.transaction_id == transaction_id
             ? { ...b, return_date: get_today_str() }
             : b
         );
       });
-      alert(data.message);
+      alert(response.data.message);
     } catch {
       (err) => {
         alert(err.message);
@@ -99,14 +95,14 @@ const Borrow = () => {
                     {b.late_fee > 0 ? (
                       <Button
                         className="primary xs"
-                        onClick={return_book(b.visitor_email, b.book_id)}
+                        onClick={return_book(b.transaction_id)}
                       >
                         Pay & Return
                       </Button>
                     ) : (
                       <Button
                         className="primary xs"
-                        onClick={return_book(b.visitor_email, b.book_id)}
+                        onClick={return_book(b.transaction_id)}
                       >
                         Return
                       </Button>
