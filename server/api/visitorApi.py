@@ -81,24 +81,24 @@ def borrow_book():
 @visitor_api.route("/return", methods=["POST"])
 def return_book():
     data=request.get_json()
-    visitor_email=data.get("visitor_email")
-    book_id=data.get("book_id")
-    # [N] get borrowed book in Borrowed book table with specific visitor_email and book_id and update payment = 0
-    # [from dummy]
-    borrowed_book=None
-    for b in dummy.borrow_books:
-        if b[0]==visitor_email and b[1]==book_id:
-            borrowed_book=b
-            break
-    if borrowed_book is None:
-        return jsonify({"error":"No borrowed book found"}), 400
-    print(datetime.now().strftime("%Y-%m-%d"))
-    borrowed_book[3]=datetime.now().strftime("%Y-%m-%d")
-     # [N] get book with specific id from Book table, and update is_available to True;
-     # [from dummy]
-    for b in dummy.books:
-        if b[0]==book_id:
-            b[5]=True
-            break
+    transaction_id=data.get("transaction_id")
+    # update return date of transaction in borrow table
+    try:
+        from main import db_connection
+        query_update_return_date= "UPDATE borrow SET return_date = %s WHERE transaction_id = %s"
+        db_connection.execute_query(query_update_return_date, (datetime.now().strftime("%Y-%m-%d"), transaction_id))
+    except (Exception) as e:
+        return jsonify({"Error updating borrow book":str(e)}), 500
+
+    #  update availability of the book in book table
+    try:
+        from main import db_connection
+        query_get_book_id= "SELECT book_id FROM borrow WHERE transaction_id = %s"
+        book_id=db_connection.fetch_data(query_get_book_id, (transaction_id,))[0][0]
+        query_update_book_availability= "UPDATE books SET is_available = TRUE WHERE book_id = %s"
+        db_connection.execute_query(query_update_book_availability, (book_id,))
+        
+    except (Exception) as e:
+        return jsonify({"Error updating book availability":str(e)}), 500
     return jsonify({"message":"Return successfully"}), 200
    
