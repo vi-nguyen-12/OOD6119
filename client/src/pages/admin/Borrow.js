@@ -3,6 +3,8 @@ import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import { get_due_date, get_today_str } from "../../helper";
+import axios from "axios";
+import { AiOutlineCheck } from "react-icons/ai";
 
 const Borrow = () => {
   const [books, setBooks] = useState([]);
@@ -38,15 +40,12 @@ const Borrow = () => {
   useEffect(() => {
     const get_borrow_books = async () => {
       try {
-        const response = await fetch(
+        const response = await axios.get(
           `http://localhost:5000/api/books/borrowed`
         );
-        if (response.status !== 200) {
-          throw new Error(response.error);
-        }
-        const data = await response.json();
 
-        setBooks(data);
+        console.log(response.data);
+        setBooks(response.data);
       } catch (err) {
         alert(err);
       }
@@ -61,10 +60,11 @@ const Borrow = () => {
           <tr>
             <th>#</th>
             <th>Visitor email</th>
+            <th>Membership</th>
             <th>Book ID</th>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Category</th>
+            <th>Title, Author,Category</th>
+            <th>Best seller</th>
+
             <th>Borrowed Date</th>
             <th>Borrowed Due Date</th>
             <th>Return Date</th>
@@ -77,10 +77,18 @@ const Borrow = () => {
             <tr key={idx}>
               <td>{idx + 1}</td>
               <td>{b.visitor_email}</td>
+              <td>{b.is_member ? <AiOutlineCheck /> : ""}</td>
               <td>{b.book_id}</td>
-              <td>{b.title}</td>
-              <td>{b.author}</td>
-              <td>{b.category}</td>
+              <td>
+                <div>{b.title}</div>
+
+                <div style={{ fontSize: "0.8rem", marginTop: "7px" }}>
+                  {b.author}
+                </div>
+                <div style={{ fontSize: "0.7rem" }}> {b.category}</div>
+              </td>
+              <td>{b.is_bestseller ? <AiOutlineCheck /> : ""}</td>
+
               <td>{b.borrow_date}</td>
               <td>{get_due_date(b.borrow_date)}</td>
               <td>{b.return_date}</td>

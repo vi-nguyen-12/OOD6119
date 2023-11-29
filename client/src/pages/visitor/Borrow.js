@@ -46,7 +46,7 @@ const Borrow = () => {
           {books.map((book, index) => (
             <tr key={index}>
               <td>{index + 1}</td>
-              <td>{book.book_id}</td>
+              <td>{book._id}</td>
               <td>{book.title}</td>
               <td>{book.author}</td>
               <td>{book.category}</td>
