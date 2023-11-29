@@ -16,8 +16,8 @@ import Home from "./pages/Home";
 const App = () => {
   return (
     <div>
-      <Banner />
       <BrowserRouter>
+        <Banner />
         <Routes>
           <Route path="/visitor/login" element={<VisitorLogin />} />
           <Route path="/visitor/home" element={<VisitorHome />}>
