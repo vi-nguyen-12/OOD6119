@@ -130,7 +130,6 @@ def update_book(book_id):
     }
 
     # [N] should query from DB to get a book by its id
-    # [from dummy]
     book=None
     for b in dummy.books:
         if b[0]==book_id:
@@ -159,40 +158,3 @@ def update_book(book_id):
         book[11]=additional_field.get("Comics")
     return jsonify({"message":"Book updated successfully"}), 200
  
-# Get all borrow books
-@book_api.route("/borrowed", methods=["GET"])
-def get_borrowed_books_dummy():
-    # [N] should query from DB to get all borrowed books from Borrowed book table, use join
-    # [from dummy]
-    borrow_books =list(dummy.borrow_books)
-    for e in dummy.borrow_books:
-        b= next((x for x in dummy.books if e[1]==x[0]),None)
-        v= next((x for x in dummy.visitors if e[0]==x[1]),None)
-        # calculate fee of each book
-        return_date=e[3]
-        if return_date is None:
-            return_date = datetime.now().strftime("%Y-%m-%d")
-      
-        late_fee=calculate_fee(e[2],return_date,v[2],b[4])
-        e.extend(b)
-        e.append(late_fee)
-    borrow_books =[{
-        "visitor_email":b[0],
-        "book_id":b[1],
-        "borrow_date":b[2],
-        "return_date":b[3],
-        "title":b[6],
-        "author":b[7],
-        "category":b[8],
-        "age_range":b[11],
-        "technology":b[12],
-        "awards":b[13],
-        "challenges":b[14],
-        "subject":b[15],
-        "artist":b[16],
-        "late_fee":b[17]
-    } for b in borrow_books]
-    
-    return jsonify( borrow_books)
-
-
