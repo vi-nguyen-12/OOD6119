@@ -1,7 +1,8 @@
 import mysql.connector
 import configparser
 
-
+# [tutorial] Create MySQL database in Azure and using MySQL Workbench app to connect to it
+# https://www.youtube.com/watch?v=O6tlkpFmZds&t=536s
 class DatabaseAccessLayer:
     def __init__(self, config_file='config.ini'):
         config = configparser.ConfigParser()

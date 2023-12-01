@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import sys
 sys.path.append('../')
 
-# Interface Product
+# Abstract Product
 class Book (ABC):
     def __init__(self,  title, author, category,is_bestseller):
         self.title = title

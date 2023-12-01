@@ -59,6 +59,7 @@ const Book = () => {
             <th>Title</th>
             <th>Author</th>
             <th>Category</th>
+            <th>Best seller</th>
             <th>Available</th>
             <th>Action</th>
           </tr>
@@ -71,6 +72,7 @@ const Book = () => {
               <td>{book.title}</td>
               <td>{book.author}</td>
               <td>{book.category}</td>
+              <td>{book.is_bestseller ? <AiOutlineCheck /> : ""}</td>
               <td>{book.is_available ? <AiOutlineCheck /> : ""}</td>
               <td>
                 {" "}

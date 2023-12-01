@@ -4,6 +4,9 @@
 from flask import Flask
 from flask_cors import CORS
 from database_handler import DatabaseAccessLayer
+# [tutorial] Set up server (Flask) and client (React) and how to connect Api between them:
+# https://www.youtube.com/watch?v=7LNl2JlZKHA
+
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})

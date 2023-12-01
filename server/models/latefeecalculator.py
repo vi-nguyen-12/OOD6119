@@ -1,9 +1,6 @@
 from abc import ABC, abstractmethod
 from ast import Str
 from datetime import datetime, timedelta
-# from visitor import Visitor
-# from book import Book
-
 
 # [Decorator Pattern]
 # Abstract component class
