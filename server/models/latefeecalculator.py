@@ -5,14 +5,14 @@ from datetime import datetime, timedelta
 # from book import Book
 
 
-# Decorator Pattern
-
+# [Decorator Pattern]
 # Abstract component class
 class LateFee(ABC):
     @abstractmethod
     def calculate_fee(self, due_date:Str,return_date:Str)-> float:
         pass
 
+# [Decorator Pattern]
 # Concrete Component class
 class FixedLateFee(LateFee):
     def calculate_fee(self,due_date:Str,return_date:Str) -> float:
@@ -23,6 +23,7 @@ class FixedLateFee(LateFee):
             return days_late * 0.5
         return 0
 
+# [Decorator Pattern]
 # Abstract Decorator class
 class LateFeeDecorator(LateFee):
     def __init__(self,decorated: LateFee) ->None:
@@ -37,7 +38,8 @@ class MembershipDecorator(LateFeeDecorator):
     def calculate_fee(self, due_date: Str, return_date: Str) -> float:
         fee= self.decorated.calculate_fee(due_date,return_date)
         return fee - 1 if fee > 1 else 0
-
+    
+# [Decorator Pattern]
 # This function applied decorator pattern to caluculate late fee:
 # Decorate the LateFee class
 # if book is bestseller, apply BestSellerDecorator
