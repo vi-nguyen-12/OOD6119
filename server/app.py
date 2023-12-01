@@ -100,12 +100,11 @@ def transform_borrowed_books(data):
         transformed_item = {
           "visitor_email": item[0],
           "book_id": item[1],
-          "title": item[2],
-          "author": item[3],
-          "category": item[4],
-          "borrow_date": item[5],
-          "return_date": item[6],
-          "late_fee": item[7]
+        
+          "borrow_date": item[2],
+          "return_date": item[3],
+          "late_fee": item[4]
+        
         }
         result.append(transformed_item)
     return result
