@@ -13,9 +13,11 @@ db_connection = DatabaseAccessLayer(config_file='config.ini')
 # API routes
 from api.bookApi import book_api
 from api.visitorApi import visitor_api
+from api.adminApi import admin_api
 
 app.register_blueprint(book_api, url_prefix='/api/books')
 app.register_blueprint(visitor_api, url_prefix='/api/visitors')
+app.register_blueprint(admin_api, url_prefix='/api/admins')
 
 
 if __name__ == '__main__':
