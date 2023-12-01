@@ -1,12 +1,12 @@
-from flask import Flask, request, Blueprint, jsonify, make_response
-import json
-from . import dummy
+from flask import request, Blueprint, jsonify
 from datetime import datetime
 from models.latefeecalculator import calculate_fee
+from models.adminloggger import AdminLogger
 # import sys
 # sys.path.append('../')
 book_api =Blueprint("book_api", __name__)
 import models.book
+
 
 # Get all books
 @book_api.route("/", methods=["GET"])
@@ -77,14 +77,14 @@ def add_book():
         "Comics":"artists",
     }
     other_field=data.get(other_fields.get(category))
-    # Create Concrete Factory based on the category
-   
+    # [Factory Pattern] Create Concrete Factory based on the category
     try:
         book_creator =models.book.BookCreatorFactory.create_creator(category)
     except TypeError as e:
         return jsonify({"error":"Invalid category"}),400
   
     try:
+        # [Factory Pattern] create a book using concrete creator
         new_book = book_creator.create_book(title,author,category,is_bestseller,other_field)
     except Exception as e:
         return jsonify({"error": f"Error creating book: {e}"}), 500
@@ -92,69 +92,74 @@ def add_book():
         new_book.save_to_db()
     except Exception as e:
         return jsonify({"error": f"Error saving book: {e}"}), 500
+    # [Singleton Pattern] ]Add this activity to logger
+    admin_logger = AdminLogger()
+    admin_logger.set_log_activity(f"Added new book {title} by {author}")
     return jsonify({"message": "Book added successfully"}), 200
-# Get a specific book
-@book_api.route("/<int:book_id>", methods=["GET"])
-def get_book(book_id):
-    try:
-        # [N] should query from DB to get a book by its id
-        select_book_query = "SELECT * FROM Book WHERE book_id =%s"
-        book_data = db.fetch_data(select_book_query, (book_id,))
 
-        if not book_data:
-            return jsonify({"error": "Book not found"}), 404
-        return jsonify({"message": f"Get book {book_id}"})
+
+# Get a specific book
+# @book_api.route("/<int:book_id>", methods=["GET"])
+# def get_book(book_id):
+#     try:
+#         # [N] should query from DB to get a book by its id
+#         select_book_query = "SELECT * FROM Book WHERE book_id =%s"
+#         book_data = db.fetch_data(select_book_query, (book_id,))
+
+#         if not book_data:
+#             return jsonify({"error": "Book not found"}), 404
+#         return jsonify({"message": f"Get book {book_id}"})
     
-    except Exception as e:
-        print(f"Error retrieving book from the database: {e}")
-        return jsonify({"error": "Failed to retrieve book"}), 500
+#     except Exception as e:
+#         print(f"Error retrieving book from the database: {e}")
+#         return jsonify({"error": "Failed to retrieve book"}), 500
 
 
 
 # Update a book
-@book_api.route("/<int:book_id>", methods=["PUT"])
-def update_book(book_id):
-    data=request.get_json()
+# @book_api.route("/<int:book_id>", methods=["PUT"])
+# def update_book(book_id):
+#     data=request.get_json()
 
-    title=data.get("title")
-    author =data.get("author")
-    category =data.get("category")
-    is_bestseller: data.get("is_bestseller") 
-    additional_field = {
-        "Kids":data.get("age_range"),
-        "ScienceFiction":data.get("technology"),
-        "Literary":data.get("awards"),
-        "Adventure":data.get("challenges"),
-        "Biography":data.get("subject"),
-        "Comics":data.get("artists"),
-    }
+#     title=data.get("title")
+#     author =data.get("author")
+#     category =data.get("category")
+#     is_bestseller: data.get("is_bestseller") 
+#     additional_field = {
+#         "Kids":data.get("age_range"),
+#         "ScienceFiction":data.get("technology"),
+#         "Literary":data.get("awards"),
+#         "Adventure":data.get("challenges"),
+#         "Biography":data.get("subject"),
+#         "Comics":data.get("artists"),
+#     }
 
-    # [N] should query from DB to get a book by its id
-    book=None
-    for b in dummy.books:
-        if b[0]==book_id:
-            book=b
-            break
-    if book is None:
-        return jsonify({"error":"No book found"}), 400
-    # [N] should update book in DB, 
-    # table includes: _id, title, author, category, is_bestseller, is_available=True, age_range, technology,awards, challenges, subject, artist
-    # [from dummy]
-    book[1]=title
-    book[2]=author
-    book[3]=category
-    book[4]=is_bestseller
-    if category== "Kid":
-        book[6]=additional_field.get("Kids")
-    elif category == "ScienceFiction":
-        book[7]=additional_field.get("ScienceFiction") 
-    elif category == "Literary":
-        book[8]=additional_field.get("Literary")
-    elif category == "Adventure":
-        book[9]=additional_field.get("Adventure")
-    elif category=="Biography":
-        book[10]=additional_field.get("Biography")
-    elif category=="Comics":
-        book[11]=additional_field.get("Comics")
-    return jsonify({"message":"Book updated successfully"}), 200
+#     # [N] should query from DB to get a book by its id
+#     book=None
+#     for b in dummy.books:
+#         if b[0]==book_id:
+#             book=b
+#             break
+#     if book is None:
+#         return jsonify({"error":"No book found"}), 400
+#     # [N] should update book in DB, 
+#     # table includes: _id, title, author, category, is_bestseller, is_available=True, age_range, technology,awards, challenges, subject, artist
+#     # [from dummy]
+#     book[1]=title
+#     book[2]=author
+#     book[3]=category
+#     book[4]=is_bestseller
+#     if category== "Kid":
+#         book[6]=additional_field.get("Kids")
+#     elif category == "ScienceFiction":
+#         book[7]=additional_field.get("ScienceFiction") 
+#     elif category == "Literary":
+#         book[8]=additional_field.get("Literary")
+#     elif category == "Adventure":
+#         book[9]=additional_field.get("Adventure")
+#     elif category=="Biography":
+#         book[10]=additional_field.get("Biography")
+#     elif category=="Comics":
+#         book[11]=additional_field.get("Comics")
+#     return jsonify({"message":"Book updated successfully"}), 200
  

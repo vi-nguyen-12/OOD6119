@@ -1,36 +1,25 @@
-import json
+
 from flask import Flask, request, Blueprint, jsonify
-from . import dummy
 from datetime import datetime
-# import sys
-# sys.path.append('../')
-# from models import visitor
-from models.latefeecalculator import calculate_fee
-from database_handler import DatabaseAccessLayer
+from models.adminloggger import AdminLogger
 
 app = Flask(__name__)
-# db = DatabaseAccessLayer(config_file='config.ini')
 
 visitor_api =Blueprint("visitor_api", __name__)
 
 # get a visitor by email
 @visitor_api.route("/<email>", methods=["GET"])
 def get_visitor(email):
-    # [N] get visitor with specific email from DB
-    # [from dummy]
-    visitor=None
-    for v in dummy.visitors:
-        if v[1]==email:
-            visitor=v
-            break
-    if visitor is None:
-        return jsonify({"error":"No visitor found"}), 400
-    result={}
-    name_cols=dummy.visitors_cols
-    for i in range(1, len(name_cols)):
-        result[name_cols[i]]=visitor[i]
-    print(result)
-    return jsonify(result)
+    # [N] get visitor by email from DB
+    try:
+        from main import db_connection
+        query_fetch_visitor = "SELECT * FROM visitors WHERE email = %s "
+        visitor = db_connection.fetch_data(query_fetch_visitor, (email,))
+    except (Exception) as e:
+        return jsonify({"error": "Failed to retrieve visitor"}), 500
+    cols=["email","name", "is_member","is_subscriber"]
+    json_visitor = [dict(zip(cols, row)) for row in visitor]
+    return jsonify(json_visitor[0])
 
 # get all borrowed books of a visitor
 @visitor_api.route("/<email>/books/borrowed", methods=["GET"])
@@ -57,14 +46,13 @@ def borrow_book():
     data=request.get_json()
     visitor_email=data.get("visitor_email")
     book_id=data.get("book_id")
-    print(type(book_id))
     try:
         from main import db_connection
         # check if the book is available:
-        query_get_book_availability= "SELECT is_available FROM books WHERE _id = %s"
-        book_availability=db_connection.fetch_data(query_get_book_availability, (book_id,))
+        query_get_book= "SELECT title, is_available FROM books WHERE _id = %s"
+        book=db_connection.fetch_data(query_get_book, (book_id,))
      
-        if book_availability[0][0] ==0:
+        if book[0][1] ==0:
             return jsonify({"error":"Book is not available to borrow"}), 500
         # [N] update is_available to False in the Book table
         query_update_book_availability= "UPDATE books SET is_available = False WHERE _id = %s"
@@ -75,6 +63,9 @@ def borrow_book():
         db_connection.execute_query(query_insert_borrow_books, (visitor_email, book_id, datetime.now().strftime("%Y-%m-%d")))
     except (Exception) as e:
         return jsonify({"Error updating database":str(e)}), 500
+    # [Singleton Pattern] Set this activity to logger
+    admin_logger = AdminLogger()
+    admin_logger.set_log_activity(visitor_email+" successfully borrow "+ book[0][0])
     return jsonify({"message":"Book borrowed successfully"}), 200
 
 # visitor return a book (and pay late fee in case)
@@ -82,7 +73,7 @@ def borrow_book():
 def return_book():
     data=request.get_json()
     transaction_id=data.get("transaction_id")
-    # update return date of transaction in borrow table
+    # Update return date of transaction in borrow table
     try:
         from main import db_connection
         query_update_return_date= "UPDATE borrow SET return_date = %s WHERE transaction_id = %s"
@@ -90,15 +81,19 @@ def return_book():
     except (Exception) as e:
         return jsonify({"Error updating borrow book":str(e)}), 500
 
-    #  update availability of the book in book table
+    #  Update availability of the book in book table
     try:
         from main import db_connection
         query_get_book_id= "SELECT book_id FROM borrow WHERE transaction_id = %s"
         book_id=db_connection.fetch_data(query_get_book_id, (transaction_id,))[0][0]
-        query_update_book_availability= "UPDATE books SET is_available = TRUE WHERE book_id = %s"
+        query_update_book_availability= "UPDATE books SET is_available = TRUE WHERE _id = %s"
         db_connection.execute_query(query_update_book_availability, (book_id,))
+        
         
     except (Exception) as e:
         return jsonify({"Error updating book availability":str(e)}), 500
+    # [Singleton Pattern] Set this activity to logger
+    admin_logger = AdminLogger()
+    admin_logger.set_log_activity(f"Transaction_id {transaction_id}, return book successfully")
     return jsonify({"message":"Return successfully"}), 200
    
