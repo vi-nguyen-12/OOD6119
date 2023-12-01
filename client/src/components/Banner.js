@@ -6,7 +6,7 @@ const Banner = () => {
 
   return (
     <h1
-      style={{ color: "red" }}
+      style={{ color: "red", width: "500px" }}
       className="mt-4 ml-4 fixed-top cursor-pointer"
       onClick={() => navigate("/")}
     >

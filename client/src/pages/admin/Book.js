@@ -103,7 +103,6 @@ const Book = () => {
       try {
         const response = await axios.get("http://localhost:5000/api/books");
 
-        console.log(response);
         setBooks(response.data);
       } catch {
         (err) => alert(err.message);

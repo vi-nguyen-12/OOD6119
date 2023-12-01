@@ -17,10 +17,13 @@ const Book = () => {
             book_id: id,
           }
         );
+        setBooks((prev) =>
+          prev.map((book) =>
+            book._id === id ? { ...book, is_available: true } : book
+          )
+        );
         alert(response.data.message);
-        // setBooks(data);
       } catch (err) {
-        console.log(err);
         alert(err.response.data.error);
       }
     };
