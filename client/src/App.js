@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Banner from "./components/Banner";
+// [library] To navigate betwwen pages
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import VisitorLogin from "./pages/visitor/Login";

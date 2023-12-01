@@ -5,4 +5,3 @@ class Visitor ():
         self.email=email
         self.is_member=is_member
         self.is_subscriber=is_subscriber
-
